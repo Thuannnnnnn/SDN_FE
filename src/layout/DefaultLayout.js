@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index'
+import { AppContent, AppSidebar, AppHeader } from '../components/index'
 import Cookies from 'js-cookie'
 
 const DefaultLayout = () => {
