@@ -33,7 +33,9 @@ export default function CourseList() {
   const [posterLinkUrl, setPosterLinkUrl] = useState(null)
   const [videoIntroUrl, setVideoIntroUrl] = useState(null)
   const [loading, setLoading] = useState(false)
-
+  const [showAddOptions, setShowAddOptions] = useState(false)
+  const [currentCourseContent, setCurrentCourseContent] = useState(null)
+  const [contentVisible, setContentVisible] = useState(false)
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [courseToDelete, setCourseToDelete] = useState(null)
   useEffect(() => {
@@ -169,6 +171,31 @@ export default function CourseList() {
     setCurrentCourse((prevCourse) => ({ ...prevCourse, description: data }))
   }
 
+  // const handleShowContent = (course) => {
+  //   // Fetch the content for the selected course
+  //   // Replace this with the actual API call to get content
+  //   //http://localhost:8080/api/content/getAllContent
+  //   //http://localhost:8080/api/content/createContent
+  //   //http://localhost:8080/api/content/updateContent
+  //   //http://localhost:8080/api/content/deleteContent
+  //   const mockContent = [
+  //     { id: 1, type: 'Video', title: 'Intro to Course' },
+  //     { id: 3, type: 'Docs', title: 'Course Syllabus' },
+  //   ];
+  //   setCurrentCourseContent({ courseName: course.courseName, content: mockContent });
+  //   setContentVisible(true);
+  // };
+
+  const handleShowContent = (course) => {
+    // Fetch the content for the selected course
+    const mockContent = [
+      { id: 1, type: 'Video', title: 'Intro to Course' },
+      { id: 2, type: 'Docs', title: 'Course Syllabus' },
+    ]
+    setCurrentCourseContent({ courseName: course.courseName, content: mockContent })
+    setContentVisible(true) // This line will now work
+  }
+
   return (
     <>
       <CTable>
@@ -199,11 +226,70 @@ export default function CourseList() {
                 <CButton color="danger" onClick={() => handleDeleteClick(course.courseId)}>
                   Delete
                 </CButton>
+                <CButton color="info" onClick={() => handleShowContent(course)}>
+                  Show Content
+                </CButton>
               </CTableDataCell>
             </CTableRow>
           ))}
         </CTableBody>
       </CTable>
+
+      {/* Content List Modal */}
+      {currentCourseContent && (
+        <CModal visible={contentVisible} onClose={() => setContentVisible(false)}>
+          <CModalHeader>
+            <CModalTitle>Content List for {currentCourseContent.courseName}</CModalTitle>
+          </CModalHeader>
+          <CModalBody>
+            {currentCourseContent.content.length > 0 ? (
+              <ul>
+                {currentCourseContent.content.map((item) => (
+                  <li key={item.id}>
+                    {item.type}: {item.title}{' '}
+                    <CButton color="danger" size="sm">
+                      Delete
+                    </CButton>{' '}
+                    <CButton color="primary" size="sm">
+                      Edit
+                    </CButton>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No content available for this course.</p>
+            )}
+          </CModalBody>
+          <CModalFooter>
+            {currentCourseContent.content.length === 0 && (
+              <CButton color="primary" onClick={() => setShowAddOptions(true)}>
+                Add Content
+              </CButton>
+            )}
+            <CButton color="secondary" onClick={() => setContentVisible(false)}>
+              Close
+            </CButton>
+          </CModalFooter>
+        </CModal>
+      )}
+
+      {/* Add Content Modal */}
+      {showAddOptions && (
+        <CModal visible={showAddOptions} onClose={() => setShowAddOptions(false)}>
+          <CModalHeader>
+            <CModalTitle>Select Content Type</CModalTitle>
+          </CModalHeader>
+          <CModalBody>
+            <CButton color="info">Add Video</CButton> <CButton color="info">Add Docs</CButton>{' '}
+            <CButton color="info">Add Quiz</CButton>
+          </CModalBody>
+          <CModalFooter>
+            <CButton color="secondary" onClick={() => setShowAddOptions(false)}>
+              Cancel
+            </CButton>
+          </CModalFooter>
+        </CModal>
+      )}
 
       {/* Edit Modal */}
       {currentCourse && (
