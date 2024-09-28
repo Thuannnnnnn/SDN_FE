@@ -416,7 +416,7 @@ export default function CourseList() {
           </CModalFooter>
         </CModal>
       )}
-      <CButton color="info" classname="w-100">
+      <CButton color="info" className="w-100">
         <a href="/#/course_add" className="text-decoration-none text-reset">
           {' '}
           Add course{' '}
