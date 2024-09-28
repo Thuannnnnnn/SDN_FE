@@ -23,7 +23,7 @@ import { CKEditor } from '@ckeditor/ckeditor5-react'
 import 'ckeditor5/ckeditor5.css'
 import axios from 'axios'
 import ReactLoading from 'react-loading'
-
+import Cookies from 'js-cookie'
 export default function CourseList() {
   const [data, setData] = useState([])
   const [visible, setVisible] = useState(false)
@@ -33,17 +33,23 @@ export default function CourseList() {
   const [posterLinkUrl, setPosterLinkUrl] = useState(null)
   const [videoIntroUrl, setVideoIntroUrl] = useState(null)
   const [loading, setLoading] = useState(false)
-
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [courseToDelete, setCourseToDelete] = useState(null)
+  const [token, setToken] = useState(null)
   useEffect(() => {
     document.title = 'List Course'
   }, [])
 
   useEffect(() => {
-    const fetchData = () => {
+    const tokenFromCookie = Cookies.get('token')
+    setToken(tokenFromCookie ? `Bearer ${tokenFromCookie}` : null)
+  }, [])
+  useEffect(() => {
+    if (token) {
       axios
-        .get('http://localhost:8080/api/course/getAll')
+        .get('http://localhost:8080/api/course/getAll', {
+          headers: { Authorization: token },
+        })
         .then((response) => {
           setData(response.data)
         })
@@ -51,8 +57,7 @@ export default function CourseList() {
           console.log(error)
         })
     }
-    fetchData()
-  }, [])
+  }, [token])
 
   const handleFileChange = (e, setter) => {
     setter(e.target.files[0])
