@@ -81,18 +81,22 @@ export default function CourseList() {
   const confirmDelete = () => {
     if (!courseToDelete) return
 
-    axios
-      .delete(`http://localhost:8080/api/course/delete/${courseToDelete}`)
-      .then(() => {
-        setData((prevData) => prevData.filter((course) => course.courseId !== courseToDelete))
-        setConfirmVisible(false)
-        setCourseToDelete(null)
-      })
-      .catch((error) => {
-        console.log(error)
-        setConfirmVisible(false)
-        setCourseToDelete(null)
-      })
+    if (token) {
+      axios
+        .delete(`http://localhost:8080/api/course/delete/${courseToDelete}`, {
+          headers: { Authorization: token },
+        })
+        .then(() => {
+          setData((prevData) => prevData.filter((course) => course.courseId !== courseToDelete))
+          setConfirmVisible(false)
+          setCourseToDelete(null)
+        })
+        .catch((error) => {
+          console.log(error)
+          setConfirmVisible(false)
+          setCourseToDelete(null)
+        })
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -102,63 +106,72 @@ export default function CourseList() {
     try {
       let videoUrl = videoIntroUrl
       let posterUrl = posterLinkUrl
-      if (videoIntro) {
-        const videoFormData = new FormData()
-        videoFormData.append('file', videoIntro)
-        const fileNameVideoIntro = videoIntroUrl.substring(videoIntroUrl.lastIndexOf('/') + 1)
-        const videoResponse = await axios.put(
-          `http://localhost:8080/api/upload/update_video/${fileNameVideoIntro}`,
-          videoFormData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
+      if (token) {
+        if (videoIntro) {
+          const videoFormData = new FormData()
+          videoFormData.append('file', videoIntro)
+          const fileNameVideoIntro = videoIntroUrl.substring(videoIntroUrl.lastIndexOf('/') + 1)
+          const videoResponse = await axios.put(
+            `http://localhost:8080/api/upload/update_video/${fileNameVideoIntro}`,
+            videoFormData,
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: token,
+              },
             },
-          },
-        )
-        videoUrl = videoResponse.data.fileUrl
-      }
-      if (posterLink) {
-        const posterFormData = new FormData()
-        posterFormData.append('file', posterLink)
-        const fileNamePosterLinkUrl = posterLinkUrl.substring(posterLinkUrl.lastIndexOf('/') + 1)
-        const posterResponse = await axios.put(
-          `http://localhost:8080/api/upload/update_image/${fileNamePosterLinkUrl}`,
-          posterFormData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
+          )
+          videoUrl = videoResponse.data.fileUrl
+        }
+        if (posterLink) {
+          const posterFormData = new FormData()
+          posterFormData.append('file', posterLink)
+          const fileNamePosterLinkUrl = posterLinkUrl.substring(posterLinkUrl.lastIndexOf('/') + 1)
+          const posterResponse = await axios.put(
+            `http://localhost:8080/api/upload/update_image/${fileNamePosterLinkUrl}`,
+            posterFormData,
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: token,
+              },
             },
+          )
+          posterUrl = posterResponse.data.fileUrl
+        }
+        setCurrentCourse((prevCourse) => ({
+          ...prevCourse,
+          posterUrl: posterUrl,
+          videoUrl: videoUrl,
+        }))
+
+        const courseFormData = new FormData()
+        courseFormData.append('courseId', currentCourse.courseId)
+        courseFormData.append('courseName', currentCourse.courseName)
+        courseFormData.append('description', currentCourse.description)
+        courseFormData.append('posterLink', posterUrl)
+        courseFormData.append('videoIntro', videoUrl)
+        courseFormData.append('price', currentCourse.price)
+        courseFormData.append('category', currentCourse.category)
+        courseFormData.append('userGenerated', currentCourse.userGenerated)
+
+        await axios.put('http://localhost:8080/api/course/updateCourse', courseFormData, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: token,
           },
-        )
-        posterUrl = posterResponse.data.fileUrl
+        })
+
+        alert('Course updated successfully!')
+        setVisible(false)
+        axios
+          .get('http://localhost:8080/api/course/getAll', {
+            headers: { Authorization: token },
+          })
+          .then((response) => {
+            setData(response.data)
+          })
       }
-      setCurrentCourse((prevCourse) => ({
-        ...prevCourse,
-        posterUrl: posterUrl,
-        videoUrl: videoUrl,
-      }))
-
-      const courseFormData = new FormData()
-      courseFormData.append('courseId', currentCourse.courseId)
-      courseFormData.append('courseName', currentCourse.courseName)
-      courseFormData.append('description', currentCourse.description)
-      courseFormData.append('posterLink', posterUrl)
-      courseFormData.append('videoIntro', videoUrl)
-      courseFormData.append('price', currentCourse.price)
-      courseFormData.append('category', currentCourse.category)
-      courseFormData.append('userGenerated', currentCourse.userGenerated)
-
-      await axios.put('http://localhost:8080/api/course/updateCourse', courseFormData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-
-      alert('Course updated successfully!')
-      setVisible(false)
-      axios.get('http://localhost:8080/api/course/getAll').then((response) => {
-        setData(response.data)
-      })
     } catch (error) {
       console.error('Error updating course:', error)
       alert('Error updating course, please try again.')
@@ -327,6 +340,7 @@ export default function CourseList() {
                   type="file"
                   onChange={(e) => handleFileChange(e, setVideoIntro)}
                   disabled={loading}
+                  placeholder={currentCourse.videoIntro}
                 />
               </CInputGroup>
 
@@ -336,6 +350,7 @@ export default function CourseList() {
                   type="file"
                   onChange={(e) => handleFileChange(e, setPosterLink)}
                   disabled={loading}
+                  placeholder={currentCourse.posterLink}
                 />
               </CInputGroup>
 
