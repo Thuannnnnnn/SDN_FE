@@ -23,6 +23,7 @@ import { CKEditor } from '@ckeditor/ckeditor5-react'
 import 'ckeditor5/ckeditor5.css'
 import axios from 'axios'
 import ReactLoading from 'react-loading'
+import { useNavigate } from 'react-router-dom'
 
 export default function CourseList() {
   const [data, setData] = useState([])
@@ -45,7 +46,11 @@ export default function CourseList() {
   useEffect(() => {
     const fetchData = () => {
       axios
-        .get('http://localhost:8080/api/course/getAll')
+        .get('http://localhost:8080/api/course/getAll', {
+          headers: {
+            Authorization: `Bearer ${`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGFkbWluLmFkbWluIiwibmFtZSI6ImFkbWluIiwiaWF0IjoxNzI3NTQwNzU0LCJleHAiOjE3Mjc1NDc5NTR9.26s-FQ2jVpFEDCbcalLQ2clKu5FPnCpDxHrgk9rmXqE`}`,
+          },
+        })
         .then((response) => {
           setData(response.data)
         })
@@ -171,29 +176,14 @@ export default function CourseList() {
     setCurrentCourse((prevCourse) => ({ ...prevCourse, description: data }))
   }
 
-  // const handleShowContent = (course) => {
-  //   // Fetch the content for the selected course
-  //   // Replace this with the actual API call to get content
-  //   //http://localhost:8080/api/content/getAllContent
-  //   //http://localhost:8080/api/content/createContent
-  //   //http://localhost:8080/api/content/updateContent
-  //   //http://localhost:8080/api/content/deleteContent
-  //   const mockContent = [
-  //     { id: 1, type: 'Video', title: 'Intro to Course' },
-  //     { id: 3, type: 'Docs', title: 'Course Syllabus' },
-  //   ];
-  //   setCurrentCourseContent({ courseName: course.courseName, content: mockContent });
-  //   setContentVisible(true);
-  // };
+  const navigate = useNavigate()
 
   const handleShowContent = (course) => {
-    // Fetch the content for the selected course
-    const mockContent = [
-      { id: 1, type: 'Video', title: 'Intro to Course' },
-      { id: 2, type: 'Docs', title: 'Course Syllabus' },
-    ]
-    setCurrentCourseContent({ courseName: course.courseName, content: mockContent })
-    setContentVisible(true) // This line will now work
+    console.log('handleShowContent called with course:', course)
+    console.log('Navigating to contents page with state:', {
+      state: { courseId: course.courseId, contents: course.contents },
+    })
+    navigate(`/content`, { state: { courseId: course.courseId, contents: course.contents } })
   }
 
   return (
