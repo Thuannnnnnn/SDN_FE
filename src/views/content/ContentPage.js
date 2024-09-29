@@ -19,27 +19,26 @@ import {
 
 const ContentPage = () => {
   const location = useLocation()
-  const { contents, courseId } = location.state || {} // Nhận courseId từ state
+  const { contents, courseId } = location.state || {}
 
-  // State cho modal và nội dung mới
   const [modalVisible, setModalVisible] = useState(false)
   const [newContent, setNewContent] = useState({ contentName: '', contentType: '' })
   const [alertVisible, setAlertVisible] = useState(false)
   const [alertMessage, setAlertMessage] = useState('')
-  const [contentList, setContentList] = useState(contents || []) // Quản lý danh sách nội dung
+  const [contentList, setContentList] = useState(contents || [])
 
   const handleAddContent = async () => {
     try {
-      const response = await axios.post(
-        'http://localhost:8080/api/content/createContent',
-        { ...newContent, courseId }, // Gửi courseId cùng với nội dung mới
-      )
+      const response = await axios.post('http://localhost:8080/api/content/createContent', {
+        ...newContent,
+        courseId,
+      })
       console.log('Content created:', response.data)
       setAlertMessage('New content added successfully!')
       setAlertVisible(true)
       setModalVisible(false)
       setNewContent({ contentName: '', contentType: '' })
-      setContentList((prev) => [...prev, response.data]) // Cập nhật danh sách nội dung
+      setContentList((prev) => [...prev, response.data])
     } catch (error) {
       console.error('Error creating content:', error)
       setAlertMessage('Failed to add content.')
@@ -50,14 +49,14 @@ const ContentPage = () => {
   const handleDeleteContent = async (contentId) => {
     try {
       const response = await axios.delete(
-        `http://localhost:8080/api/content/deleteContent?contentId=${contentId}&courseId=${courseId}`, // Thêm courseId vào query
+        `http://localhost:8080/api/content/deleteContent?contentId=${contentId}&courseId=${courseId}`,
       )
       console.log('Content deleted:', response.data)
       setAlertMessage('Content deleted successfully!')
       setAlertVisible(true)
       setContentList((prevContents) =>
         prevContents.filter((content) => content.contentId !== contentId),
-      ) // Cập nhật danh sách nội dung
+      )
     } catch (error) {
       console.error('Error deleting content:', error)
       setAlertMessage('Failed to delete content.')
@@ -109,7 +108,11 @@ const ContentPage = () => {
                 >
                   Edit
                 </CButton>
-                <CButton color="danger" onClick={() => handleDeleteContent(content.contentId)}>
+                <CButton
+                  color="danger"
+                  className="ms-2"
+                  onClick={() => handleDeleteContent(content.contentId)}
+                >
                   Delete
                 </CButton>
               </div>
@@ -156,14 +159,17 @@ const ContentPage = () => {
         </CModalFooter>
       </CModal>
 
-      <CAlert
-        color="success"
-        show={alertVisible}
-        onClose={() => setAlertVisible(false)}
-        dismissible
-      >
-        {alertMessage}
-      </CAlert>
+      {/* Ẩn alert khi chưa ấn nút */}
+      {alertVisible && (
+        <CAlert
+          color="success"
+          show={alertVisible}
+          onClose={() => setAlertVisible(false)}
+          dismissible
+        >
+          {alertMessage}
+        </CAlert>
+      )}
     </div>
   )
 }
