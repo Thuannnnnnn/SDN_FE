@@ -50,10 +50,11 @@ export default function CourseList() {
   useEffect(() => {
     if (token) {
       axios
-        .get('http://localhost:8080/api/course/getAll', {
+        .get('http://localhost:3030/api/course/getAll', {
           headers: { Authorization: token },
         })
         .then((response) => {
+          console.log(response.data)
           setData(response.data)
         })
         .catch((error) => {
@@ -83,7 +84,7 @@ export default function CourseList() {
 
     if (token) {
       axios
-        .delete(`http://localhost:8080/api/course/delete/${courseToDelete}`, {
+        .delete(`http://localhost:3030/api/course/delete/${courseToDelete}`, {
           headers: { Authorization: token },
         })
         .then(() => {
@@ -112,7 +113,7 @@ export default function CourseList() {
           videoFormData.append('file', videoIntro)
           const fileNameVideoIntro = videoIntroUrl.substring(videoIntroUrl.lastIndexOf('/') + 1)
           const videoResponse = await axios.put(
-            `http://localhost:8080/api/upload/update_video/${fileNameVideoIntro}`,
+            `http://localhost:3030/api/upload/update_video/${fileNameVideoIntro}`,
             videoFormData,
             {
               headers: {
@@ -128,7 +129,7 @@ export default function CourseList() {
           posterFormData.append('file', posterLink)
           const fileNamePosterLinkUrl = posterLinkUrl.substring(posterLinkUrl.lastIndexOf('/') + 1)
           const posterResponse = await axios.put(
-            `http://localhost:8080/api/upload/update_image/${fileNamePosterLinkUrl}`,
+            `http://localhost:3030/api/upload/update_image/${fileNamePosterLinkUrl}`,
             posterFormData,
             {
               headers: {
@@ -155,7 +156,7 @@ export default function CourseList() {
         courseFormData.append('category', currentCourse.category)
         courseFormData.append('userGenerated', currentCourse.userGenerated)
 
-        await axios.put('http://localhost:8080/api/course/updateCourse', courseFormData, {
+        await axios.put('http://localhost:3030/api/course/updateCourse', courseFormData, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: token,
@@ -165,7 +166,7 @@ export default function CourseList() {
         alert('Course updated successfully!')
         setVisible(false)
         axios
-          .get('http://localhost:8080/api/course/getAll', {
+          .get('http://localhost:3030/api/course/getAll', {
             headers: { Authorization: token },
           })
           .then((response) => {

@@ -30,14 +30,13 @@ const Login = () => {
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
-      const response = await axios.post('http://localhost:8080/api/auth/login/admin', {
+      const response = await axios.post('http://localhost:3030/api/auth/login/admin', {
         username,
         password,
       })
       console.log('Login successful:', response.data)
       if (!token) {
         await Cookies.set('token', response.data.token)
-        console.log('co chay vao day khong', response.data)
         navigate('/dashboard')
         window.location.reload()
       }
