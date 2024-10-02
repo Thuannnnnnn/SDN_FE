@@ -4,6 +4,7 @@ import React from 'react'
 const Dashboard = React.lazy(() => import('../views/dashboard/Dashboard'))
 const Widgets = React.lazy(() => import('../views/widgets/Widgets'))
 const Course = React.lazy(() => import('../views/course/CourseList'))
+const Content = React.lazy(() => import('../views/content/ContentPage'))
 const CourseAdd = React.lazy(() => import('../views/course/CourseAdd'))
 
 const routes = [
@@ -11,6 +12,7 @@ const routes = [
   { path: '/widgets', name: 'Widgets', element: Widgets, auth: true },
   { path: '/course', name: 'Course', element: Course, auth: true },
   { path: '/course_add', name: 'Course', element: CourseAdd },
+  { path: '/content', name: 'Content', element: Content, auth: true },
 ]
 
 export default routes
