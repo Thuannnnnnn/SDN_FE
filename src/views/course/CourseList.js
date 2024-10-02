@@ -23,6 +23,10 @@ import { CKEditor } from '@ckeditor/ckeditor5-react'
 import 'ckeditor5/ckeditor5.css'
 import axios from 'axios'
 import ReactLoading from 'react-loading'
+<<<<<<< HEAD
+=======
+import { useNavigate } from 'react-router-dom'
+>>>>>>> features/CRUDCC
 import Cookies from 'js-cookie'
 export default function CourseList() {
   const [data, setData] = useState([])
@@ -39,6 +43,10 @@ export default function CourseList() {
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [courseToDelete, setCourseToDelete] = useState(null)
   const [token, setToken] = useState(null)
+<<<<<<< HEAD
+=======
+
+>>>>>>> features/CRUDCC
   useEffect(() => {
     document.title = 'List Course'
   }, [])
@@ -48,6 +56,7 @@ export default function CourseList() {
     setToken(tokenFromCookie ? `Bearer ${tokenFromCookie}` : null)
   }, [])
   useEffect(() => {
+<<<<<<< HEAD
     if (token) {
       axios
         .get('http://localhost:8080/api/course/getAll', {
@@ -60,6 +69,23 @@ export default function CourseList() {
           console.log(error)
         })
     }
+=======
+    const fetchData = () => {
+      if (token) {
+        axios
+          .get('http://localhost:8080/api/course/getAll', {
+            headers: { Authorization: token },
+          })
+          .then((response) => {
+            setData(response.data)
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      }
+    }
+    fetchData()
+>>>>>>> features/CRUDCC
   }, [token])
 
   const handleFileChange = (e, setter) => {
@@ -190,29 +216,14 @@ export default function CourseList() {
     setCurrentCourse((prevCourse) => ({ ...prevCourse, description: data }))
   }
 
-  // const handleShowContent = (course) => {
-  //   // Fetch the content for the selected course
-  //   // Replace this with the actual API call to get content
-  //   //http://localhost:8080/api/content/getAllContent
-  //   //http://localhost:8080/api/content/createContent
-  //   //http://localhost:8080/api/content/updateContent
-  //   //http://localhost:8080/api/content/deleteContent
-  //   const mockContent = [
-  //     { id: 1, type: 'Video', title: 'Intro to Course' },
-  //     { id: 3, type: 'Docs', title: 'Course Syllabus' },
-  //   ];
-  //   setCurrentCourseContent({ courseName: course.courseName, content: mockContent });
-  //   setContentVisible(true);
-  // };
+  const navigate = useNavigate()
 
   const handleShowContent = (course) => {
-    // Fetch the content for the selected course
-    const mockContent = [
-      { id: 1, type: 'Video', title: 'Intro to Course' },
-      { id: 2, type: 'Docs', title: 'Course Syllabus' },
-    ]
-    setCurrentCourseContent({ courseName: course.courseName, content: mockContent })
-    setContentVisible(true) // This line will now work
+    console.log('handleShowContent called with course:', course)
+    console.log('Navigating to contents page with state:', {
+      state: { courseId: course.courseId, contents: course.contents },
+    })
+    navigate(`/content`, { state: { courseId: course.courseId, contents: course.contents } })
   }
 
   return (
