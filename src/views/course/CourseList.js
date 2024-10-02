@@ -23,10 +23,7 @@ import { CKEditor } from '@ckeditor/ckeditor5-react'
 import 'ckeditor5/ckeditor5.css'
 import axios from 'axios'
 import ReactLoading from 'react-loading'
-<<<<<<< HEAD
-=======
 import { useNavigate } from 'react-router-dom'
->>>>>>> features/CRUDCC
 import Cookies from 'js-cookie'
 export default function CourseList() {
   const [data, setData] = useState([])
@@ -38,15 +35,12 @@ export default function CourseList() {
   const [videoIntroUrl, setVideoIntroUrl] = useState(null)
   const [loading, setLoading] = useState(false)
   const [showAddOptions, setShowAddOptions] = useState(false)
-  const [currentCourseContent, setCurrentCourseContent] = useState(null)
+  const [currentCourseContent] = useState(null)
   const [contentVisible, setContentVisible] = useState(false)
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [courseToDelete, setCourseToDelete] = useState(null)
   const [token, setToken] = useState(null)
-<<<<<<< HEAD
-=======
 
->>>>>>> features/CRUDCC
   useEffect(() => {
     document.title = 'List Course'
   }, [])
@@ -56,20 +50,6 @@ export default function CourseList() {
     setToken(tokenFromCookie ? `Bearer ${tokenFromCookie}` : null)
   }, [])
   useEffect(() => {
-<<<<<<< HEAD
-    if (token) {
-      axios
-        .get('http://localhost:8080/api/course/getAll', {
-          headers: { Authorization: token },
-        })
-        .then((response) => {
-          setData(response.data)
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    }
-=======
     const fetchData = () => {
       if (token) {
         axios
@@ -85,7 +65,6 @@ export default function CourseList() {
       }
     }
     fetchData()
->>>>>>> features/CRUDCC
   }, [token])
 
   const handleFileChange = (e, setter) => {
@@ -442,7 +421,7 @@ export default function CourseList() {
           </CModalFooter>
         </CModal>
       )}
-      <CButton color="info" className="w-100">
+      <CButton color="info" classname="w-100">
         <a href="/#/course_add" className="text-decoration-none text-reset">
           {' '}
           Add course{' '}
