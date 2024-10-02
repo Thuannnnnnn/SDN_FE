@@ -23,10 +23,7 @@ import { CKEditor } from '@ckeditor/ckeditor5-react'
 import 'ckeditor5/ckeditor5.css'
 import axios from 'axios'
 import ReactLoading from 'react-loading'
-<<<<<<< HEAD
-=======
 import { useNavigate } from 'react-router-dom'
->>>>>>> features/CRUDCC
 import Cookies from 'js-cookie'
 export default function CourseList() {
   const [data, setData] = useState([])
@@ -43,10 +40,7 @@ export default function CourseList() {
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [courseToDelete, setCourseToDelete] = useState(null)
   const [token, setToken] = useState(null)
-<<<<<<< HEAD
-=======
 
->>>>>>> features/CRUDCC
   useEffect(() => {
     document.title = 'List Course'
   }, [])
@@ -56,7 +50,6 @@ export default function CourseList() {
     setToken(tokenFromCookie ? `Bearer ${tokenFromCookie}` : null)
   }, [])
   useEffect(() => {
-<<<<<<< HEAD
     if (token) {
       axios
         .get('http://localhost:3030/api/course/getAll', {
@@ -70,7 +63,6 @@ export default function CourseList() {
           console.log(error)
         })
     }
-=======
     const fetchData = () => {
       if (token) {
         axios
@@ -86,7 +78,6 @@ export default function CourseList() {
       }
     }
     fetchData()
->>>>>>> features/CRUDCC
   }, [token])
 
   const handleFileChange = (e, setter) => {
