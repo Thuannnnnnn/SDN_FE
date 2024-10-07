@@ -209,9 +209,6 @@ export default function CourseList() {
   }
 
   const navigate = useNavigate()
-  const handleShowExam = (course) => {
-    navigate(`/exam`, { state: { courseId: course.courseId, exam: course } })
-  }
   const handleShowContent = (course) => {
     navigate(`/content`, { state: { courseId: course.courseId, contents: course.contents } })
   }
@@ -245,9 +242,6 @@ export default function CourseList() {
                 </CButton>{' '}
                 <CButton color="danger" onClick={() => handleDeleteClick(course.courseId)}>
                   Delete
-                </CButton>
-                <CButton color="secondary" onClick={() => handleShowExam(course)}>
-                  Show Exam
                 </CButton>
                 <CButton color="info" onClick={() => handleShowContent(course)}>
                   Show Content

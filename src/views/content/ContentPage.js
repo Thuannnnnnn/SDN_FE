@@ -74,7 +74,17 @@ const ContentPage = () => {
   const [blobName, setBlobName] = useState('')
 
   // Dữ liệu cho Quiz
-  const [quizData, setquizData] = useState([])
+  const [quizData, setquizData] = useState({
+    _id: '',
+    __v: 0,
+    questions: [
+      {
+        question: '',
+        options: ['', '', '', ''], // Mảng các lựa chọn ban đầu
+        answer: null, // Đáp án đúng ban đầu
+      },
+    ],
+  })
   const handleQuizTabChenga = (event, newValue) => {
     setquizTabValue(newValue)
   }
@@ -85,8 +95,7 @@ const ContentPage = () => {
         const response = await axios.get(`http://localhost:8080/api/course/getById/${courseId}`, {
           headers: { Authorization: token },
         })
-        console.log(response.data.course.contents)
-        setContentList(response.data.course.contents)
+        setContentList((prevContentList) => [...prevContentList, response.data.course.contents])
       }
     } catch (error) {
       setAlertMessage('Failed to add content.')
@@ -116,52 +125,61 @@ const ContentPage = () => {
     setDocsTitle(e.target.value)
   }
   const saveToSessionStorage = () => {
-    sessionStorage.setItem('quizData', JSON.stringify(quizData))
+    sessionStorage.setItem('quizData', JSON.stringify(quizData.questions))
   }
 
   const handleAddQuestion = () => {
     if (validateQuestions()) {
-      const updatedquizData = [
+      const updatedQuizData = {
         ...quizData,
-        {
-          question: '',
-          options: ['', '', '', ''],
-          answer: -1,
-        },
-      ]
-      setquizData(updatedquizData)
+        questions: [
+          ...quizData.questions,
+          {
+            question: '',
+            options: ['', '', '', ''],
+            answer: null,
+          },
+        ],
+      }
+      setquizData(updatedQuizData)
       saveToSessionStorage()
     }
   }
 
   const handleQuestionChange = (index, value) => {
-    const updatedquizData = quizData.map((question, questionIndex) => {
-      if (questionIndex === index) {
-        return { ...question, question: value }
-      }
-      return question
-    })
-    setquizData(updatedquizData)
+    const updatedQuizData = {
+      ...quizData,
+      questions: quizData.questions.map((question, questionIndex) => {
+        if (questionIndex === index) {
+          return { ...question, question: value }
+        }
+        return question
+      }),
+    }
+    setquizData(updatedQuizData)
   }
 
   const handleAnswerChange = (questionIndex, optionsIndex, value) => {
-    const updatedquizData = quizData.map((question, qIndex) => {
-      if (qIndex === questionIndex) {
-        const updatedOptions = question.options.map((option, oIndex) => {
-          if (oIndex === optionsIndex) {
-            return value
-          }
-          return option
-        })
-        return { ...question, options: updatedOptions }
-      }
-      return question
-    })
-    setquizData(updatedquizData)
+    const updatedQuizData = {
+      ...quizData,
+      questions: quizData.questions.map((question, qIndex) => {
+        if (qIndex === questionIndex) {
+          const updatedOptions = question.options.map((option, oIndex) => {
+            if (oIndex === optionsIndex) {
+              return value
+            }
+            return option
+          })
+          return { ...question, options: updatedOptions }
+        }
+        return question
+      }),
+    }
+    setquizData(updatedQuizData)
   }
 
   const validateQuestions = () => {
-    for (let question of quizData) {
+    for (let question of quizData.questions) {
       if (!question.question.trim()) {
         setAlertMessage('Please fill in the current question before adding a new one.')
         setAlertVisible(true)
@@ -179,19 +197,25 @@ const ContentPage = () => {
   }
 
   const handleCorrectAnswerChange = (questionIndex, optionsIndex) => {
-    const updatedquizData = quizData.map((question, qIndex) => {
-      if (qIndex === questionIndex) {
-        return { ...question, answer: optionsIndex }
-      }
-      return question
-    })
-    setquizData(updatedquizData)
+    const updatedQuizData = {
+      ...quizData,
+      questions: quizData.questions.map((question, qIndex) => {
+        if (qIndex === questionIndex) {
+          return { ...question, answer: optionsIndex }
+        }
+        return question
+      }),
+    }
+    setquizData(updatedQuizData)
   }
 
   const handleDeleteQuestion = (index) => {
-    const updatedquizData = quizData.filter((_, i) => i !== index)
-    setquizData(updatedquizData)
-    sessionStorage.setItem('quizData', JSON.stringify(updatedquizData))
+    const updatedQuizData = {
+      ...quizData,
+      questions: quizData.questions.filter((_, i) => i !== index),
+    }
+    setquizData(updatedQuizData)
+    sessionStorage.setItem('quizData', JSON.stringify(updatedQuizData))
   }
   //edit content
   const handleEditContent = (content) => {
@@ -210,18 +234,24 @@ const ContentPage = () => {
       setValue(1)
     } else if (content.contentType === 'questions') {
       setQuizTi(content.contentName)
-      console.log(content)
-      const quiz = content.contentRef
-      if (quiz) {
-        const extractedQuizData = {
-          _id: quiz._id,
-          question: quiz.question,
-          options: quiz.options,
-          answer: quiz.answer,
-        }
-        setquizData([extractedQuizData])
-      }
+      const quiz = content.contentRef.questions
+      if (quiz && Array.isArray(quiz)) {
+        // Kiểm tra nếu quiz là một mảng
+        const extractedQuizData = quiz.map((item) => ({
+          _id: item._id,
+          question: item.question,
+          options: item.options,
+          answer: item.answer,
+        }))
 
+        setquizData({
+          _id: content.contentRef._id,
+          __v: content.contentRef.__v,
+          questions: extractedQuizData,
+        })
+      } else {
+        console.error('No questions found or quiz is not an array')
+      }
       setValue(2)
     }
   }
@@ -284,6 +314,7 @@ const ContentPage = () => {
       setAlertMessage('Content updated successfully!')
       setAlertVisible(true)
       setModalVisible(false)
+      window.location.reload()
     } catch (error) {
       setAlertMessage('Failed to update content.')
       setAlertVisible(true)
@@ -296,7 +327,6 @@ const ContentPage = () => {
     setVideoTitle('')
     setDocsTitle('')
     setQuizTi('')
-    setquizData([])
   }
   //add to content
   const handleAddContent = async () => {
@@ -325,8 +355,7 @@ const ContentPage = () => {
           },
         })
         id = response.data.newDocs._id
-      }
-      if (selectType === 'videos') {
+      } else if (selectType === 'videos') {
         console.log('có vào đây không')
         console.log(videoTitle)
         title = videoTitle
@@ -345,20 +374,20 @@ const ContentPage = () => {
           },
         })
         id = response.data.newVideo._id
-      }
-      if (selectType === 'questions') {
+      } else if (selectType === 'questions') {
         title = quizTitle
-        response = await axios.post(
-          'http://localhost:8080/api/quizz/questions',
-          {
-            questions: quizData,
-            contentId: contentList?.contentId,
-          },
-          {
-            headers: { Authorization: token },
-          },
-        )
-        id = response.data.data[0]._id
+        if (title) {
+          response = await axios.post(
+            'http://localhost:8080/api/quizz/questions',
+            {
+              questions: quizData.questions,
+            },
+            {
+              headers: { Authorization: token },
+            },
+          )
+          id = response.data.data._id
+        }
       }
       if (!id) {
         console.log('no id')
@@ -380,6 +409,7 @@ const ContentPage = () => {
       setModalVisible(false)
       setContentList((prev) => [...prev, response1.data.course])
       sessionStorage.removeItem('quizData')
+      window.location.reload()
     } catch (error) {
       setAlertMessage('Failed to add content.')
       setAlertVisible(true)
@@ -416,6 +446,7 @@ const ContentPage = () => {
         setAlertMessage('Failed to delete content.')
       }
       setAlertMessage('Content deleted successfully!')
+      window.location.reload()
     } catch (error) {
       setAlertMessage('Failed to delete content.')
       setAlertVisible(true)
@@ -608,12 +639,12 @@ const ContentPage = () => {
 
               {/* Panel for adding quiz */}
               <CustomTabPanel value={quizTabValue} index={0}>
-                {quizData.map((question, questionIndex) => (
+                {quizData?.questions?.map((question, questionIndex) => (
                   <div
                     key={questionIndex}
                     className="mb-4"
                     style={{
-                      border: '1px solib #000',
+                      border: '1px solid #000',
                       borderRadius: '8px',
                       padding: '16px',
                       boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
@@ -621,9 +652,7 @@ const ContentPage = () => {
                     }}
                   >
                     <div className="d-flex justify-content-between align-items-center">
-                      <CFormLabel className="me-2" style={{ fontStyle: 'oblique' }}>{`Question ${
-                        questionIndex + 1
-                      }`}</CFormLabel>
+                      <CFormLabel>{`Question ${questionIndex + 1}`}</CFormLabel>
                       <CButton
                         color="danger"
                         size="sm"
@@ -632,49 +661,36 @@ const ContentPage = () => {
                         Delete
                       </CButton>
                     </div>
-                    <div className="d-flex "></div>
-                    {/* Câu hỏi */}
+
                     <CFormInput
                       type="text"
                       placeholder={`Question ${questionIndex + 1}`}
                       value={question.question}
                       onChange={(e) => handleQuestionChange(questionIndex, e.target.value)}
                     />
-                    {/* Danh sách các câu trả lời */}
-                    {quizData[questionIndex] &&
-                      Array.isArray(quizData[questionIndex].options) &&
-                      quizData[questionIndex].options.map((option, optionsIndex) => (
-                        <div
-                          key={optionsIndex}
-                          className="mb-2 mt-3"
-                          style={{ justifyContent: 'space-around', alignContent: 'center' }}
-                        >
-                          <CFormLabel className="me-2" style={{ fontStyle: 'oblique' }}>{`Answer ${
-                            optionsIndex + 1
-                          }`}</CFormLabel>
-                          <div className="d-flex ">
-                            <CFormInput
-                              type="text"
-                              placeholder={`Answer ${optionsIndex + 1}`}
-                              value={option}
-                              onChange={(e) =>
-                                handleAnswerChange(questionIndex, optionsIndex, e.target.value)
-                              }
-                            />
-                            <div className="form-check ms-3" style={{ alignContent: 'center' }}>
-                              <input
-                                type="checkbox"
-                                className="form-check-input"
-                                checked={quizData[questionIndex].answer === optionsIndex}
-                                onChange={() =>
-                                  handleCorrectAnswerChange(questionIndex, optionsIndex)
-                                }
-                              />
-                              <CFormLabel className="form-check-label">Correct</CFormLabel>
-                            </div>
-                          </div>
+
+                    {question.options.map((option, optionsIndex) => (
+                      <div key={optionsIndex} className="d-flex align-items-center mb-2">
+                        <CFormLabel>{`Answer ${optionsIndex + 1}`}</CFormLabel>
+                        <CFormInput
+                          type="text"
+                          placeholder={`Answer ${optionsIndex + 1}`}
+                          value={option}
+                          onChange={(e) =>
+                            handleAnswerChange(questionIndex, optionsIndex, e.target.value)
+                          }
+                        />
+                        <div className="form-check ms-3">
+                          <input
+                            type="checkbox"
+                            className="form-check-input"
+                            checked={question.answer === optionsIndex}
+                            onChange={() => handleCorrectAnswerChange(questionIndex, optionsIndex)}
+                          />
+                          <CFormLabel className="form-check-label">Correct</CFormLabel>
                         </div>
-                      ))}
+                      </div>
+                    ))}
                   </div>
                 ))}
                 <CButton color="primary" onClick={handleAddQuestion}>
