@@ -30,7 +30,7 @@ const Login = () => {
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
-      const response = await axios.post('http://localhost:3030/api/auth/login/admin', {
+      const response = await axios.post('http://localhost:8080/api/auth/login/admin', {
         username,
         password,
       })
