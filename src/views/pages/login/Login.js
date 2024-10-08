@@ -37,7 +37,6 @@ const Login = () => {
       console.log('Login successful:', response.data)
       if (!token) {
         await Cookies.set('token', response.data.token)
-        console.log('co chay vao day khong', response.data)
         navigate('/dashboard')
         window.location.reload()
       }

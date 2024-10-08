@@ -6,7 +6,6 @@ const Widgets = React.lazy(() => import('../views/widgets/Widgets'))
 const Course = React.lazy(() => import('../views/course/CourseList'))
 const Content = React.lazy(() => import('../views/content/ContentPage'))
 const CourseAdd = React.lazy(() => import('../views/course/CourseAdd'))
-
 const routes = [
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, auth: true },
   { path: '/widgets', name: 'Widgets', element: Widgets, auth: true },
