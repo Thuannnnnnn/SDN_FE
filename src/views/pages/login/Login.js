@@ -25,6 +25,9 @@ const Login = () => {
   const navigate = useNavigate()
   const [token, setToken] = useState(null)
   useEffect(() => {
+    document.title = 'Login'
+  }, [])
+  useEffect(() => {
     setToken(Cookies.get('token'))
   }, [navigate, token])
   const handleLogin = async (event) => {

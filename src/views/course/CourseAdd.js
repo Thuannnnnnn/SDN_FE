@@ -14,6 +14,7 @@ import { CKEditor, CKEditorContext } from '@ckeditor/ckeditor5-react'
 import 'ckeditor5/ckeditor5.css'
 import axios from 'axios'
 import ReactLoading from 'react-loading'
+import Cookies from 'js-cookie'
 export default function CourseAdd() {
   const [courseName, setCourseName] = useState('')
   const [price, setPrice] = useState('')
@@ -23,6 +24,7 @@ export default function CourseAdd() {
   const [description, setDescription] = useState('')
   const [userGenerated] = useState('currentUser')
   const [loading, setLoading] = useState(false)
+  const [token, setToken] = useState('')
   const [errors, setErrors] = useState({
     courseName: '',
     price: '',
@@ -33,8 +35,9 @@ export default function CourseAdd() {
 
   useEffect(() => {
     document.title = 'Add Course'
+    const tokenFromCookie = Cookies.get('token')
+    setToken(tokenFromCookie ? `Bearer ${tokenFromCookie}` : null)
   }, [])
-
   const handleFileChange = (e, setter) => {
     setter(e.target.files[0])
   }
@@ -67,6 +70,7 @@ export default function CourseAdd() {
         {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         },
       )
@@ -81,6 +85,7 @@ export default function CourseAdd() {
         {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         },
       )
@@ -95,9 +100,11 @@ export default function CourseAdd() {
       courseFormData.append('price', price)
       courseFormData.append('category', category)
       courseFormData.append('userGenerated', userGenerated)
+      courseFormData.append('contents', [])
       await axios.post('http://localhost:8080/api/course/createCourse', courseFormData, {
         headers: {
           'Content-Type': 'application/json',
+          Authorization: token,
         },
       })
 
