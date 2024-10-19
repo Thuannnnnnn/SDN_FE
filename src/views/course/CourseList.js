@@ -243,7 +243,11 @@ export default function CourseList() {
                 <CButton color="danger" onClick={() => handleDeleteClick(course.courseId)}>
                   Delete
                 </CButton>
-                <CButton color="info" onClick={() => handleShowContent(course)}>
+                <CButton
+                  color="info"
+                  onClick={() => handleShowContent(course)}
+                  style={{ marginTop: 5 }}
+                >
                   Show Content
                 </CButton>
               </CTableDataCell>

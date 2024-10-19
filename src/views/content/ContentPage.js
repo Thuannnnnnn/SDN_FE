@@ -88,6 +88,9 @@ const ContentPage = () => {
   const handleQuizTabChenga = (event, newValue) => {
     setquizTabValue(newValue)
   }
+  useEffect(() => {
+    document.title = 'List Content'
+  }, [])
 
   const handleGetContent = async () => {
     try {
@@ -225,7 +228,7 @@ const ContentPage = () => {
     if (content.contentType === 'videos') {
       setVideoTitle(content.contentName)
       setIdForData(content.contentRef._id)
-      setBlobName(content.contentRef.videoId)
+      setBlobName(content.contentRef.title)
       setValue(0)
     } else if (content.contentType === 'docs') {
       setDocsTitle(content.contentName)
@@ -430,12 +433,9 @@ const ContentPage = () => {
       if (response.status === 200) {
         console.log('check ' + contentType)
         if (contentType === 'videos') {
-          await axios.delete(
-            `http://localhost:8080/api/upload/delete_video/${contentRef.videoId}`,
-            {
-              headers: { Authorization: token },
-            },
-          )
+          await axios.delete(`http://localhost:8080/api/upload/delete_video/${contentRef.title}`, {
+            headers: { Authorization: token },
+          })
         } else if (contentType === 'docs') {
           await axios.delete(`http://localhost:8080/api/upload/delete_docs/${contentRef.docsId}`, {
             headers: { Authorization: token },
