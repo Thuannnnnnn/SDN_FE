@@ -19,22 +19,23 @@ const _nav = [
     name: 'Course',
     to: '/course',
     icon: <CIcon icon={cilDrop} customClassName="nav-icon" />,
+    badge: {
+      color: 'info',
+    },
   },
   {
     component: CNavItem,
     name: 'User',
     to: '/user',
     icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
+    color: 'info',
   },
   {
     component: CNavItem,
-    name: 'Widgets',
-    to: '/widgets',
+    name: 'Score',
+    to: '/score',
     icon: <CIcon icon={cilCalculator} customClassName="nav-icon" />,
-    badge: {
-      color: 'info',
-      text: 'NEW',
-    },
+    color: 'info',
   },
 ]
 

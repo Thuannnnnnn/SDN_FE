@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CRow,
   CCol,
@@ -12,8 +12,122 @@ import { getStyle } from '@coreui/utils'
 import { CChartBar, CChartLine } from '@coreui/react-chartjs'
 import CIcon from '@coreui/icons-react'
 import { cilArrowBottom, cilArrowTop, cilOptions } from '@coreui/icons'
+import axios from 'axios'
+import Cookies from 'js-cookie'
+import { Navigate } from 'react-router-dom'
 
 const WidgetsDropdown = () => {
+  const [dataUser, setDataUser] = useState()
+  const [dataCourse, setDataCourse] = useState()
+  const [dataHistory, setDataHistory] = useState()
+  const [dataPurchaseds, setDataPurchaseds] = useState()
+  const [token, setToken] = useState(null)
+
+  useEffect(() => {
+    document.title = 'List User'
+  }, [])
+
+  useEffect(() => {
+    const tokenFromCookie = Cookies.get('token')
+    setToken(tokenFromCookie ? `Bearer ${tokenFromCookie}` : null)
+  }, [])
+
+  useEffect(() => {
+    if (token) {
+      axios
+        .get('http://localhost:8080/api/user/getAllUser', {
+          headers: { Authorization: token },
+        })
+        .then((response) => {
+          const dataRes = response.data
+          setDataUser(dataRes.length)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    }
+  }, [token])
+
+  useEffect(() => {
+    if (token) {
+      axios
+        .get('http://localhost:8080/api/user/getAllUser', {
+          headers: { Authorization: token },
+        })
+        .then((response) => {
+          const dataRes = response.data
+          setDataUser(dataRes.length)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    }
+  }, [token])
+
+  useEffect(() => {
+    if (token) {
+      axios
+        .get('http://localhost:8080/api/course/getAll', {
+          headers: { Authorization: token },
+        })
+        .then((response) => {
+          setDataCourse(response.data.length)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    }
+  }, [token])
+
+  useEffect(() => {
+    if (token) {
+      axios
+        .get('http://localhost:8080/api/order/getAll', {
+          headers: { Authorization: token },
+        })
+        .then((response) => {
+          const price = response.data
+          const total = price.reduce((acc, current) => acc + current.price, 0)
+          const formattedTotal = total.toLocaleString('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+          })
+          setDataHistory(formattedTotal)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    }
+  }, [token])
+
+  useEffect(() => {
+    if (token) {
+      axios
+        .get('http://localhost:8080/api/coursePurchased/getAll', {
+          headers: { Authorization: token },
+        })
+        .then((response) => {
+          const orders = response.data
+          let totalCourses = 0
+
+          if (Array.isArray(orders)) {
+            for (let i = 0; i < orders.length; i++) {
+              totalCourses += orders[i].courses.length
+            }
+            setDataPurchaseds(totalCourses)
+          } else {
+            console.log('Orders is not an array or is undefined:', orders)
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    }
+  }, [token])
+
+  const handleShowUser = () => {
+    Navigate(`/user`)
+  }
   return (
     <CRow>
       <CCol sm={6} lg={3}>
@@ -22,7 +136,7 @@ const WidgetsDropdown = () => {
           color="primary"
           value={
             <>
-              26K{' '}
+              {dataUser}{' '}
               <span className="fs-6 fw-normal">
                 (-12.4% <CIcon icon={cilArrowBottom} />)
               </span>
@@ -35,7 +149,7 @@ const WidgetsDropdown = () => {
                 <CIcon icon={cilOptions} className="text-high-emphasis-inverse" />
               </CDropdownToggle>
               <CDropdownMenu>
-                <CDropdownItem>Action</CDropdownItem>
+                <CDropdownItem onClick={() => handleShowUser()}>Action</CDropdownItem>
                 <CDropdownItem>Another action</CDropdownItem>
                 <CDropdownItem>Something else here...</CDropdownItem>
                 <CDropdownItem disabled>Disabled action</CDropdownItem>
@@ -109,7 +223,7 @@ const WidgetsDropdown = () => {
           color="info"
           value={
             <>
-              $6.200{' '}
+              {dataHistory}{' '}
               <span className="fs-6 fw-normal">
                 (40.9% <CIcon icon={cilArrowTop} />)
               </span>
@@ -195,13 +309,13 @@ const WidgetsDropdown = () => {
           color="warning"
           value={
             <>
-              2.49{' '}
+              {dataCourse}{' '}
               <span className="fs-6 fw-normal">
                 (84.7% <CIcon icon={cilArrowTop} />)
               </span>
             </>
           }
-          title="Conversion Rate"
+          title="Số lượng khóa học đang có"
           action={
             <CDropdown alignment="end">
               <CDropdownToggle color="transparent" caret={false} className="p-0">
@@ -268,13 +382,13 @@ const WidgetsDropdown = () => {
           color="danger"
           value={
             <>
-              44K{' '}
+              {dataPurchaseds}{' '}
               <span className="fs-6 fw-normal">
                 (-23.6% <CIcon icon={cilArrowBottom} />)
               </span>
             </>
           }
-          title="Sessions"
+          title="Số người đã mua khóa học"
           action={
             <CDropdown alignment="end">
               <CDropdownToggle color="transparent" caret={false} className="p-0">

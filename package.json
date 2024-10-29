@@ -16,11 +16,13 @@
   "dependencies": {
     "@ckeditor/ckeditor5-react": "^9.1.0",
     "@coreui/chartjs": "^3.1.2",
-    "@coreui/coreui": "^4.2.6",
+    "@coreui/coreui": "^4.3.0",
+    "@coreui/coreui-pro": "^5.6.0",
     "@coreui/icons": "^3.0.1",
     "@coreui/icons-react": "^2.1.0",
-    "@coreui/react": "^4.9.0-rc.0",
+    "@coreui/react": "^4.11.1",
     "@coreui/react-chartjs": "^2.1.3",
+    "@coreui/react-pro": "^5.7.0",
     "@coreui/utils": "^2.0.2",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
@@ -29,6 +31,7 @@
     "chart.js": "^3.9.1",
     "classnames": "^2.3.2",
     "core-js": "^3.31.0",
+    "file-saver": "^2.0.5",
     "js-cookie": "^3.0.5",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
@@ -41,7 +44,8 @@
     "react-spinners": "^0.14.1",
     "redux": "4.2.1",
     "sdn-fe": "file:",
-    "simplebar-react": "^2.4.3"
+    "simplebar-react": "^2.4.3",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
