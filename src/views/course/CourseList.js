@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import {
-  CTable,
-  CTableRow,
-  CTableHeaderCell,
-  CTableHead,
-  CTableBody,
-  CTableDataCell,
   CButton,
   CModal,
   CModalBody,
@@ -17,6 +11,7 @@ import {
   CInputGroupText,
   CFormInput,
   CFormSelect,
+  CImage,
 } from '@coreui/react'
 import { ClassicEditor, Bold, Essentials, Italic, Paragraph } from 'ckeditor5'
 import { CKEditor } from '@ckeditor/ckeditor5-react'
@@ -25,6 +20,7 @@ import axios from 'axios'
 import ReactLoading from 'react-loading'
 import { useNavigate } from 'react-router-dom'
 import Cookies from 'js-cookie'
+import { CSmartTable } from '@coreui/react-pro'
 export default function CourseList() {
   const [data, setData] = useState([])
   const [visible, setVisible] = useState(false)
@@ -35,8 +31,6 @@ export default function CourseList() {
   const [videoIntroUrl, setVideoIntroUrl] = useState(null)
   const [loading, setLoading] = useState(false)
   const [showAddOptions, setShowAddOptions] = useState(false)
-  const [currentCourseContent] = useState(null)
-  const [contentVisible, setContentVisible] = useState(false)
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [courseToDelete, setCourseToDelete] = useState(null)
   const [token, setToken] = useState(null)
@@ -63,21 +57,6 @@ export default function CourseList() {
           console.log(error)
         })
     }
-    const fetchData = () => {
-      if (token) {
-        axios
-          .get('http://localhost:8080/api/course/getAll', {
-            headers: { Authorization: token },
-          })
-          .then((response) => {
-            setData(response.data)
-          })
-          .catch((error) => {
-            console.log(error)
-          })
-      }
-    }
-    fetchData()
   }, [token])
 
   const handleFileChange = (e, setter) => {
@@ -209,90 +188,91 @@ export default function CourseList() {
   }
 
   const navigate = useNavigate()
+
   const handleShowContent = (course) => {
     navigate(`/content`, { state: { courseId: course.courseId, contents: course.contents } })
   }
 
+  const columns = [
+    { key: 'courseId', label: 'Course ID', _style: { width: '10%' } },
+    { key: 'courseName', label: 'Course Name', _style: { width: '25%' } },
+    {
+      key: 'posterLink',
+      label: 'Poster',
+      _style: { width: '5%' },
+      filter: false,
+      sorter: false,
+    },
+    { key: 'price', label: 'Price', _style: { width: '10%' } },
+    { key: 'category', label: 'Category', _style: { width: '20%' } },
+    {
+      key: 'actions',
+      label: 'Actions',
+      filter: false,
+      _style: { width: '25%', height: '100%' },
+      sorter: false,
+    },
+  ]
   return (
     <>
-      <CTable>
-        <CTableHead>
-          <CTableRow>
-            <CTableHeaderCell scope="col">Course ID</CTableHeaderCell>
-            <CTableHeaderCell scope="col">Course Name</CTableHeaderCell>
-            <CTableHeaderCell scope="col">Poster Link</CTableHeaderCell>
-            <CTableHeaderCell scope="col">Price</CTableHeaderCell>
-            <CTableHeaderCell scope="col">Category</CTableHeaderCell>
-            <CTableHeaderCell scope="col">Action</CTableHeaderCell>
-          </CTableRow>
-        </CTableHead>
-        <CTableBody>
-          {data.map((course) => (
-            <CTableRow key={course.courseId}>
-              <CTableDataCell>{course.courseId}</CTableDataCell>
-              <CTableDataCell>{course.courseName}</CTableDataCell>
-              <CTableDataCell>
-                <img src={course.posterLink} alt="poster" width={100} />
-              </CTableDataCell>
-              <CTableDataCell>{course.price}</CTableDataCell>
-              <CTableDataCell>{course.category}</CTableDataCell>
-              <CTableDataCell>
-                <CButton color="success" onClick={() => handleEditClick(course)}>
+      <CSmartTable
+        columns={columns}
+        columnFilter
+        items={data}
+        itemsPerPageSelect
+        itemsPerPage={5}
+        columnSorter
+        tableProps={{
+          striped: true,
+          hover: true,
+          responsive: true,
+        }}
+        scopedColumns={{
+          posterLink: (item) => (
+            <td>
+              <CImage src={`${item.posterLink}`} width={'100%'} />
+            </td>
+          ),
+          actions: (course) => (
+            <td
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <>
+                <CButton
+                  color="success"
+                  onClick={() => handleEditClick(course)}
+                  style={{ marginRight: '5px' }}
+                  shape="rounded-pill"
+                >
                   Edit
-                </CButton>{' '}
-                <CButton color="danger" onClick={() => handleDeleteClick(course.courseId)}>
+                </CButton>
+                <CButton
+                  color="danger"
+                  onClick={() => handleDeleteClick(course.courseId)}
+                  style={{ marginRight: '5px' }}
+                  shape="rounded-pill"
+                >
                   Delete
                 </CButton>
                 <CButton
-                  color="info"
+                  as="a"
+                  color="warning"
                   onClick={() => handleShowContent(course)}
-                  style={{ marginTop: 5 }}
+                  shape="rounded-pill"
                 >
-                  Show Content
+                  Add content
                 </CButton>
-              </CTableDataCell>
-            </CTableRow>
-          ))}
-        </CTableBody>
-      </CTable>
-
-      {/* Content List Modal */}
-      {currentCourseContent && (
-        <CModal visible={contentVisible} onClose={() => setContentVisible(false)}>
-          <CModalHeader>
-            <CModalTitle>Content List for {currentCourseContent.courseName}</CModalTitle>
-          </CModalHeader>
-          <CModalBody>
-            {currentCourseContent.content.length > 0 ? (
-              <ul>
-                {currentCourseContent.content.map((item) => (
-                  <li key={item.id}>
-                    {item.type}: {item.title}{' '}
-                    <CButton color="danger" size="sm">
-                      Delete
-                    </CButton>{' '}
-                    <CButton color="primary" size="sm">
-                      Edit
-                    </CButton>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No content available for this course.</p>
-            )}
-          </CModalBody>
-          <CModalFooter>
-            {currentCourseContent.content.length === 0 && (
-              <CButton color="primary" onClick={() => setShowAddOptions(true)}>
-                Add Content
-              </CButton>
-            )}
-            <CButton color="secondary" onClick={() => setContentVisible(false)}>
-              Close
-            </CButton>
-          </CModalFooter>
-        </CModal>
-      )}
+              </>
+            </td>
+          ),
+        }}
+        sorterValue={{ column: 'status', state: 'asc' }}
+        pagination
+      />
 
       {/* Add Content Modal */}
       {showAddOptions && (

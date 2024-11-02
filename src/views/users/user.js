@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import {
-  CTable,
-  CTableRow,
-  CTableHeaderCell,
-  CTableHead,
-  CTableBody,
-  CTableDataCell,
-} from '@coreui/react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import { CSmartTable } from '@coreui/react-pro'
 
 export default function UserList() {
   const [data, setData] = useState([])
@@ -39,30 +32,40 @@ export default function UserList() {
     }
   }, [token])
 
+  const columns = [
+    { key: 'email', label: 'Email', _style: { width: '25%' } },
+    { key: 'name', label: 'Name', _style: { width: '25%' } },
+    { key: 'role', label: 'Role', _style: { width: '20%' } },
+    { key: 'gender', label: 'Gender', _style: { width: '15%' } },
+    { key: 'phoneNumber', label: 'Phone Number', _style: { width: '15%' } },
+  ]
+  const renderValue = (value) => {
+    return value ? value : 'NOT'
+  }
   return (
-    <>
-      <CTable>
-        <CTableHead>
-          <CTableRow>
-            <CTableHeaderCell scope="col">Email</CTableHeaderCell>
-            <CTableHeaderCell scope="col">Name</CTableHeaderCell>
-            <CTableHeaderCell scope="col">Role</CTableHeaderCell>
-            <CTableHeaderCell scope="col">Gender</CTableHeaderCell>
-            <CTableHeaderCell scope="col">Phone Number</CTableHeaderCell>
-          </CTableRow>
-        </CTableHead>
-        <CTableBody>
-          {data.map((user) => (
-            <CTableRow key={user.email}>
-              <CTableDataCell>{user.email}</CTableDataCell>
-              <CTableDataCell>{user.name}</CTableDataCell>
-              <CTableDataCell>{user.role}</CTableDataCell>
-              <CTableDataCell>{user.gender}</CTableDataCell>
-              <CTableDataCell>{user.phoneNumber}</CTableDataCell>
-            </CTableRow>
-          ))}
-        </CTableBody>
-      </CTable>
-    </>
+    <CSmartTable
+      columns={columns}
+      items={data}
+      columnFilter
+      columnSorter
+      itemsPerPageSelect
+      itemsPerPage={5}
+      pagination
+      tableProps={{
+        striped: true,
+        hover: true,
+        responsive: true,
+      }}
+      tableBodyProps={{
+        className: 'align-middle',
+      }}
+      scopedColumns={{
+        email: (item) => <td>{renderValue(item.email)}</td>,
+        name: (item) => <td>{renderValue(item.name)}</td>,
+        role: (item) => <td>{renderValue(item.role)}</td>,
+        gender: (item) => <td>{renderValue(item.gender)}</td>,
+        phoneNumber: (item) => <td>{renderValue(item.phoneNumber)}</td>,
+      }}
+    />
   )
 }

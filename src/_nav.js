@@ -19,6 +19,9 @@ const _nav = [
     name: 'Course',
     to: '/course',
     icon: <CIcon icon={cilDrop} customClassName="nav-icon" />,
+    badge: {
+      color: 'info',
+    },
   },
   {
     component: CNavItem,
