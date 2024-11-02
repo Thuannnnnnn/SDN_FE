@@ -28,6 +28,7 @@ const _nav = [
     name: 'User',
     to: '/user',
     icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
+    color: 'info',
   },
   {
     component: CNavItem,
@@ -37,13 +38,10 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Widgets',
-    to: '/widgets',
+    name: 'Score',
+    to: '/score',
     icon: <CIcon icon={cilCalculator} customClassName="nav-icon" />,
-    badge: {
-      color: 'info',
-      text: 'NEW',
-    },
+    color: 'info',
   },
 ]
 
