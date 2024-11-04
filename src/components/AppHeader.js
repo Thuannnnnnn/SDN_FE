@@ -22,11 +22,7 @@ const AppHeader = () => {
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
 
-  return (
-    <div>
-    
-    </div>
-  )
+  return <div></div>
 }
 
 export default AppHeader
