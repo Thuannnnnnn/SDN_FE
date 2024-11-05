@@ -127,6 +127,9 @@ const ContentPage = () => {
   const handleDocsInputChange = (e) => {
     setDocsTitle(e.target.value)
   }
+  const saveToSessionStorage = () => {
+    sessionStorage.setItem('quizData', JSON.stringify(quizData.questions))
+  }
 
   const handleAddQuestion = () => {
     if (validateQuestions()) {
@@ -142,6 +145,7 @@ const ContentPage = () => {
         ],
       }
       setquizData(updatedQuizData)
+      saveToSessionStorage()
     }
   }
 
@@ -174,6 +178,7 @@ const ContentPage = () => {
         return question
       }),
     }
+
     setquizData(updatedQuizData)
   }
 
@@ -309,7 +314,6 @@ const ContentPage = () => {
           headers: { Authorization: token },
         },
       )
-      console.log(response1)
       setAlertMessage('Content updated successfully!')
       setAlertVisible(true)
       setModalVisible(false)
@@ -374,8 +378,6 @@ const ContentPage = () => {
         })
         id = response.data.newDocs._id
       } else if (selectType === 'videos') {
-        console.log('có vào đây không')
-        console.log(videoTitle)
         title = videoTitle
         if (!selectedFile) {
           setAlertMessage('Please select a file to upload.')
@@ -446,7 +448,6 @@ const ContentPage = () => {
         },
       })
       if (response.status === 200) {
-        console.log('check ' + contentType)
         if (contentType === 'videos') {
           await axios.delete(`http://localhost:8080/api/upload/delete_video/${contentRef.title}`, {
             headers: { Authorization: token },
@@ -493,7 +494,6 @@ const ContentPage = () => {
     setToken(tokenFromCookie ? `Bearer ${tokenFromCookie}` : null)
     handleGetContent()
   }, [token])
-  console.log(loading)
   return (
     <div>
       <h1>Content List</h1>
