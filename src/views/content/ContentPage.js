@@ -20,7 +20,7 @@ import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import Box from '@mui/material/Box'
 import Cookies from 'js-cookie'
-
+import ReactLoading from 'react-loading'
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props
 
@@ -62,7 +62,7 @@ const ContentPage = () => {
   const [lockedTab, setLockedTab] = useState(null)
   const [token, setToken] = useState(null)
   const [editingContent, setEditingContent] = useState(null)
-
+  const [loading, setLoading] = useState(false)
   const [selectType, setSelectType] = useState('videos')
   // Track input states for Video and Docs tabs
   const [videoTitle, setVideoTitle] = useState('')
@@ -317,6 +317,7 @@ const ContentPage = () => {
       setAlertMessage('Content updated successfully!')
       setAlertVisible(true)
       setModalVisible(false)
+      setLoading(false)
       window.location.reload()
     } catch (error) {
       setAlertMessage('Failed to update content.')
@@ -334,10 +335,11 @@ const ContentPage = () => {
   //add to content
   const handleAddContent = async () => {
     try {
+      setLoading(true)
       setIsEditing(false)
       let title
       if (!(quizTitle || videoTitle || docsTitle)) {
-        setAlertMessage('Please fill in the title of the quiz.')
+        setAlertMessage('Please fill in the title')
       }
       let response
       let id
@@ -410,6 +412,7 @@ const ContentPage = () => {
       setAlertMessage('New content added successfully!')
       setAlertVisible(true)
       setModalVisible(false)
+      setLoading(false)
       setContentList((prev) => [...prev, response1.data.course])
       sessionStorage.removeItem('quizData')
       window.location.reload()
@@ -478,6 +481,7 @@ const ContentPage = () => {
     setToken(tokenFromCookie ? `Bearer ${tokenFromCookie}` : null)
     handleGetContent()
   }, [token])
+  console.log(loading)
   return (
     <div>
       <h1>Content List</h1>
@@ -712,6 +716,12 @@ const ContentPage = () => {
               </div>
             </CustomTabPanel>
           </Box>
+          {loading && (
+            <div className="text-center">
+              <ReactLoading type="spin" color="#000" height={50} width={50} />{' '}
+              {/* Spinning loader */}
+            </div>
+          )}
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setModalVisible(false)}>
