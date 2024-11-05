@@ -127,9 +127,6 @@ const ContentPage = () => {
   const handleDocsInputChange = (e) => {
     setDocsTitle(e.target.value)
   }
-  const saveToSessionStorage = () => {
-    sessionStorage.setItem('quizData', JSON.stringify(quizData.questions))
-  }
 
   const handleAddQuestion = () => {
     if (validateQuestions()) {
@@ -145,7 +142,6 @@ const ContentPage = () => {
         ],
       }
       setquizData(updatedQuizData)
-      saveToSessionStorage()
     }
   }
 
@@ -327,9 +323,26 @@ const ContentPage = () => {
   const handleAddNewContent = () => {
     setIsEditing(false)
     setModalVisible(true)
+    setValue(0)
+    setIdForData('')
+    setBlobName('')
     setVideoTitle('')
     setDocsTitle('')
+    setLockedTab(null)
+    setEditingContent(false)
     setQuizTi('')
+    sessionStorage.removeItem('quizData')
+    setquizData({
+      _id: '',
+      __v: 0,
+      questions: [
+        {
+          question: '',
+          options: ['', '', '', ''],
+          answer: null,
+        },
+      ],
+    })
   }
   //add to content
   const handleAddContent = async () => {
@@ -411,7 +424,6 @@ const ContentPage = () => {
       setAlertVisible(true)
       setModalVisible(false)
       setContentList((prev) => [...prev, response1.data.course])
-      sessionStorage.removeItem('quizData')
       window.location.reload()
     } catch (error) {
       setAlertMessage('Failed to add content.')
@@ -459,7 +471,7 @@ const ContentPage = () => {
         if (videoTitle.trim()) setLockedTab(0)
         if (docsTitle.trim()) setLockedTab(1)
         if (quizTitle.trim()) setLockedTab(2)
-        if (quizData.length > 0) setLockedTab(2)
+        if (quizData.length >= 0) setLockedTab(2)
       } else {
         setLockedTab(null)
       }
