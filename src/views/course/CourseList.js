@@ -193,6 +193,33 @@ export default function CourseList() {
     navigate(`/content`, { state: { courseId: course.courseId, contents: course.contents } })
   }
 
+  const handleCreateOrUpdateExam = async (courseId, questionNumber = 10) => {
+    if (!token) {
+      console.error('Token is missing')
+      return
+    }
+
+    // Log courseId, questionNumber, and token for debugging
+    console.log('Creating/updating exam for course ID:', courseId)
+    console.log('Number of questions:', questionNumber)
+
+    try {
+      const response = await axios.post(
+        'http://localhost:8080/api/exams/createOrUpdate',
+        { courseId, questionNumber },
+        { headers: { Authorization: token } },
+      )
+      console.log('Server response:', response.data)
+      alert(response.data.msg)
+    } catch (error) {
+      console.error(
+        'Error creating/updating exam:',
+        error.response ? error.response.data : error.message,
+      )
+      alert('Error creating/updating exam')
+    }
+  }
+
   const columns = [
     { key: 'courseId', label: 'Course ID', _style: { width: '10%' } },
     { key: 'courseName', label: 'Course Name', _style: { width: '25%' } },
@@ -265,6 +292,12 @@ export default function CourseList() {
                   shape="rounded-pill"
                 >
                   Add content
+                </CButton>
+                <CButton
+                  color="info"
+                  onClick={() => handleCreateOrUpdateExam(course._id, 10)} // Adjust the questionNumber as needed
+                >
+                  Create/Update Exam
                 </CButton>
               </>
             </td>
